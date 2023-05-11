@@ -10,24 +10,18 @@
 </head>
 
 <body>
-    <h1>hello world</h1>
-    <ul>
-        <li>
-            hello1
-        </li>
-        <li>
-            hello2
-        </li>
-    </ul>
-    <!-- <canvas></canvas> -->
-    <div id="svg_by_d3" class="text-center"></div>
+    <center>
+        <h1 id="title"></h1>
+        <div id="svg_by_d3"></div>
+    </center>
+
+
+
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="d3.min.js"></script>
     <script type="text/javascript" src="topojson-client.min.js"></script>
     <script type="text/javascript" src="versor.js"></script>
     <script>
-        // import data from "./data.json";
-        // var hamo = './data.json'
         const land = topojson.feature(world, world.objects.land)
         const borders = topojson.mesh(world, world.objects.countries, (a, b) => a !== b)
         const countries = topojson.feature(world, world.objects.countries).features
@@ -36,6 +30,7 @@
         const width = 780
         const height = Math.min(width)
         var name = ""
+
         function context2d(width, height, dpi) {
             if (dpi == null) dpi = devicePixelRatio;
             var canvas = document.createElement("canvas");
@@ -48,7 +43,6 @@
 
             return context;
         }
-        // canvas = {
 
         (async () => {
 
@@ -58,10 +52,11 @@
 
             function render(country, arc) {
                 context.clearRect(0, 0, width, height);
-                context.beginPath(), path(land), context.fillStyle = "#ccc", context.fill();
-                context.beginPath(), path(country), context.fillStyle = "#00f", context.fill();
+                context.beginPath(), path(sphere), context.fillStyle = "skyblue", context.fill();
+                context.beginPath(), path(land), context.fillStyle = "#ddd", context.fill();
+                context.beginPath(), path(country), context.fillStyle = "#f00", context.fill();
                 context.beginPath(), path(borders), context.strokeStyle = "#fff", context.lineWidth = 0.5, context.stroke();
-                context.beginPath(), path(sphere), context.strokeStyle = "#000", context.lineWidth = 1.5, context.stroke();
+                context.beginPath(), path(sphere), context.strokeStyle = "#fff", context.lineWidth = 1.5, context.stroke();
                 context.beginPath(), path(arc), context.stroke();
                 return context.canvas;
             }
@@ -71,14 +66,14 @@
                 name = country.properties.name;
                 console.log(country);
                 render(country);
-
+                document.querySelector("#title").innerHTML = name
                 p1 = p2, p2 = d3.geoCentroid(country);
                 r1 = r2, r2 = [-p2[0], tilt - p2[1], 0];
                 const ip = d3.geoInterpolate(p1, p2);
                 const iv = Versor.interpolateAngles(r1, r2);
 
                 await d3.transition()
-                    .duration(1250)
+                    .duration(1450)
                     .tween("render", () => t => {
                         projection.rotate(iv(t));
                         render(country, { type: "LineString", coordinates: [p1, ip(t)] });
@@ -89,7 +84,6 @@
                     })
                     .end();
             }
-            // }
         })()
     </script>
 
